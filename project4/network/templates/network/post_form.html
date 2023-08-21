@@ -1,0 +1,39 @@
+{% extends 'network/layout.html' %}
+
+{% block body%}
+<form id="post-form" method="post" action="{% url 'post-create' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Post</button>
+</form>
+
+<div id="message" style="display: none;"></div>
+<!-- <script>
+$(document).ready(function () {
+    $('#post-form').submit(function (e) {
+        e.preventDefault();  // Prevent the default form submission
+
+        var form = $(this);
+        var formData = new FormData(form[0]);
+
+        $.ajax({
+            url: form.attr('/post-list'),  // Use the form's action URL
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                // Handle the success response
+                $('#message').html('<p class="success">' + data.message + '</p>').show();
+                form[0].reset();  // Clear the form fields
+            },
+            error: function (xhr) {
+                // Handle errors
+                var errorMessage = JSON.parse(xhr.responseText).message;
+                $('#message').html('<p class="error">' + errorMessage + '</p>').show();
+            }
+        });
+    });
+});
+</script> -->
+{% endblock %}

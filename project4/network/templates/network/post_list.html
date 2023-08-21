@@ -1,0 +1,106 @@
+{% extends 'network/layout.html'%}
+
+{% block body%}
+
+<style>
+    .mydiv{
+        border: 2px solid #eee;
+        padding-top:4rem;
+        padding-bottom:4rem;
+        width:33%;
+        margin-top:1.5rem;
+        margin-left:2rem;
+        text-align: center;
+    }
+</style>
+<!-- {% for post in posts %}
+    <h3>{{ post.user.username }}</h3>
+    <p>{{ post.content }}</p>
+    <button class="like-btn" data-post-id="{{ post.id }}">
+        Like <span class="like-count">{{ post.likes.count }}</span>
+    </button>
+{% endfor %} -->
+
+
+
+<div class="container">
+        <div class="col-md-6">
+            <h3>Create a New Post</h3>
+            <form method="post" id="post-form">
+                {% csrf_token %}
+                {{ form.content.label_tag }}
+                {{ form.content }}
+                
+                <button type="submit" class="btn btn-primary mt-3">Post</button>
+            </form>
+        </div>
+           
+            <h3>Posts</h3>
+            {% for post in page_obj %}
+            <div class="mydiv">
+                <p><a href="{% url 'user-profile' post.user_id %}">{{ post.user.username }}</a></p><br>
+                {{ post.content }}<br>
+                <a href="{% url 'post-edit' post.id %}">Edit</a>
+                <!-- <button class="like-btn" data-post-id="{{ post.id }}">
+                    Like <span class="like-count">{{ post.likes.count }}</span>
+                </button> -->
+                <i class="fa fa-heart like-btn" data-post-id="{{ post.id }}" aria-hidden="true">
+                    <span class="like-count">{{ post.likes.count }}</span></i><br>
+                    {{post.created_at}}
+            </div>
+            {% endfor %}
+</div>
+<div class="pagination justify-content-center">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="page-link">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-link">previous</a>
+        {% endif %}
+
+        <span class="current-page">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+<div id="message" style="display: none;"></div>
+<script>
+    $(document).ready(function () {
+    var csrftoken = $('meta[name=csrf-token]').attr('content');
+
+    $('#post-form').submit(function (e) {
+        e.preventDefault();
+
+        var form = $(this);
+        var formData = new FormData(form[0]);
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            headers: {'X-CSRFToken': csrftoken},
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                $('#message').html('<p class="success">' + data.message + '</p>').show();
+                form[0].reset();
+
+                // Append the new post to the list
+                $('#post-list').append('<li>' + data.content + '</li>'+` <button class="like-btn" data-post-id="{{ post.id }}">
+                        Like <span class="like-count">{{ post.likes.count }}</span>
+                    </button>`);
+            },
+            error: function (xhr) {
+                console.log('Error:', xhr.responseText);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+
+

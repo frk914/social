@@ -1,0 +1,80 @@
+{% extends "network/layout.html" %}
+
+{% block body %}
+
+
+   <h3 class="text-center mt-4"> Post</h3>
+{% comment %} <a href="{% url 'list' %}">my list</a><hr> {% endcomment %}
+<div class="form-group">
+    <div class="col-md-6">
+    <label for="title">Title:</label>
+    <input type="text" class="form-control" id="post" name="post" placeholder="Enter the title">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-md-6">
+    <label for="content">description:</label>
+    <textarea class="form-control" id="desc" name="desc" rows="3" placeholder="Enter the content"></textarea>
+    </div>
+</div>
+
+<button id="submit-btn" class="btn btn-primary ml-3">Submit</button>
+<div id="response-message"></div>
+<div id="response-value"></div>
+{% for t in users %}
+<div class="mydiv"> 
+{{t.user.username }}                
+{{t.post}} 
+{{t.description }}
+<br><a href="">Edit</a>
+</div>        
+{% endfor %}
+<div class="pagination justify-content-center">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="page-link">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-link">previous</a>
+        {% endif %}
+
+        <span class="current-page">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+  <script>
+    $(document).ready(function () {
+        $('#submit-btn').on('click', function () {
+            var post = $('#post').val();
+            var desc = $('#desc').val();
+
+            $.ajax({
+                url: '{% url "create" %}',
+                type: 'post',
+                data: {
+               'post': post,
+                'desc': desc,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function (data) {
+                if (data.post && data.desc) {
+            
+                     
+                    $("#response-value").html('<div class=mydiv>'+'{{post.user.username}}' + '<br>'+post+ '<br>' +desc+ '<br>' +'<a href=>Edit</a></div>');
+                    
+                     $('#post').val('');
+                     $('#desc').val('');
+                    
+                }else {
+                $('#response-message').html(data.message);
+            }
+        }
+    });
+});
+});
+</script>
+{% endblock %}

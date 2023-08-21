@@ -1,0 +1,8 @@
+{% extends 'network/layout.html'%}
+{% block body %}
+<ul>
+    {% for user in users_list %}
+        <li>{{ user.username }} - <a href="{% url 'follow_user' user_id=user.id %}">Follow/Unfollow</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
